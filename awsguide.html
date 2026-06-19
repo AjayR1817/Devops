@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 study tracker</title>
+<style>
+  :root{
+    --bg:#11151a;
+    --panel:#171c23;
+    --panel-2:#1d232b;
+    --line:#2a3138;
+    --line-soft:#232a31;
+    --text:#e7e9ea;
+    --text-dim:#9aa3ad;
+    --text-faint:#5c6670;
+    --amber:#e8a23d;
+    --amber-dim:#3a3022;
+    --teal:#3dc7a8;
+    --teal-dim:#1c3530;
+    --teal-bright:#5ee0c0;
+    --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  a{color:var(--teal-bright);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  /* ---------- header ---------- */
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(17,21,26,0.97);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:880px;
+    margin:0 auto;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .topbar-title{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.5px;
+    color:var(--text-dim);
+    flex-shrink:0;
+  }
+  .topbar-title b{color:var(--amber);font-weight:600;}
+  .progress-track{
+    flex:1;
+    height:6px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:3px;
+    overflow:hidden;
+    position:relative;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--teal);
+    width:0%;
+    transition:width 0.4s ease;
+  }
+  .progress-pct{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--teal-bright);
+    flex-shrink:0;
+    min-width:38px;
+    text-align:right;
+  }
+  .reset-btn{
+    flex-shrink:0;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-faint);
+    font-family:var(--mono);
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--text-dim);color:var(--text-dim);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:880px;
+    margin:0 auto;
+    padding:40px 20px 24px;
+  }
+  .hero-eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin:0 0 10px;
+  }
+  .hero h1{
+    font-size:28px;
+    font-weight:600;
+    margin:0 0 12px;
+    letter-spacing:-0.3px;
+  }
+  .hero p{
+    color:var(--text-dim);
+    font-size:15px;
+    max-width:620px;
+    margin:0 0 4px;
+  }
+  .hero-meta{
+    display:flex;
+    gap:18px;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+  .hero-meta-item{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+  }
+  .hero-meta-item b{color:var(--text);font-weight:600;}
+
+  /* ---------- nav rail ---------- */
+  .phase-nav{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 20px 30px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .phase-pill{
+    font-family:var(--mono);
+    font-size:11px;
+    padding:6px 10px;
+    border-radius:4px;
+    border:1px solid var(--line);
+    color:var(--text-faint);
+    cursor:pointer;
+    background:var(--panel);
+    transition:all 0.15s;
+  }
+  .phase-pill:hover{border-color:var(--text-dim);color:var(--text-dim);}
+  .phase-pill.complete{border-color:var(--teal-dim);color:var(--teal-bright);background:rgba(61,199,168,0.06);}
+
+  /* ---------- phase blocks ---------- */
+  .container{max-width:880px;margin:0 auto;padding:0 20px;}
+
+  .phase{
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-bottom:18px;
+    overflow:hidden;
+    background:var(--panel);
+    scroll-margin-top:80px;
+  }
+  .phase-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 20px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .phase-num{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-faint);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:3px 7px;
+    flex-shrink:0;
+    min-width:30px;
+    text-align:center;
+  }
+  .phase.complete .phase-num{color:var(--teal-bright);border-color:var(--teal-dim);}
+  .phase-titles{flex:1;min-width:0;}
+  .phase-title{font-size:16px;font-weight:500;margin:0;}
+  .phase-sub{font-size:13px;color:var(--text-faint);margin:3px 0 0;}
+  .phase-count{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+    flex-shrink:0;
+  }
+  .phase.complete .phase-count{color:var(--teal-bright);}
+  .chevron{
+    width:18px;height:18px;flex-shrink:0;
+    color:var(--text-faint);
+    transition:transform 0.2s;
+  }
+  .phase.open .chevron{transform:rotate(90deg);}
+
+  .phase-bar{
+    height:3px;
+    background:var(--line-soft);
+    position:relative;
+  }
+  .phase-bar-fill{
+    height:100%;
+    background:var(--amber);
+    width:0%;
+    transition:width 0.4s ease;
+  }
+  .phase.complete .phase-bar-fill{background:var(--teal);}
+
+  .phase-body{
+    display:none;
+    border-top:1px solid var(--line);
+    padding:6px 20px 18px;
+  }
+  .phase.open .phase-body{display:block;}
+
+  .topic-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:11px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .topic-row:last-of-type{border-bottom:none;}
+
+  .checkbox{
+    width:18px;height:18px;
+    flex-shrink:0;
+    margin-top:2px;
+    border:1.5px solid var(--text-faint);
+    border-radius:4px;
+    cursor:pointer;
+    position:relative;
+    background:transparent;
+    transition:all 0.15s;
+  }
+  .checkbox.checked{
+    background:var(--teal);
+    border-color:var(--teal);
+  }
+  .checkbox.checked::after{
+    content:'';
+    position:absolute;
+    left:5px;top:1px;
+    width:5px;height:9px;
+    border:solid var(--bg);
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+
+  .topic-main{flex:1;min-width:0;}
+  .topic-link{
+    font-size:14.5px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .topic-link:hover{color:var(--teal-bright);}
+  .topic-row.done .topic-link{color:var(--text-faint);text-decoration:line-through;text-decoration-color:var(--line);}
+  .topic-desc{font-size:12.5px;color:var(--text-faint);margin-top:2px;}
+
+  .ts-link{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-faint);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:2px 7px;
+    flex-shrink:0;
+    margin-top:1px;
+    white-space:nowrap;
+  }
+  .ts-link:hover{color:var(--teal-bright);border-color:var(--teal-dim);text-decoration:none;}
+
+  /* project + checkpoint callouts */
+  .callout{
+    margin:14px 0 4px;
+    border-radius:6px;
+    padding:13px 14px;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  .callout-project{
+    background:var(--amber-dim);
+    border:1px solid #4a3a22;
+    color:#f0c98a;
+  }
+  .callout-check{
+    background:var(--teal-dim);
+    border:1px solid #234741;
+    color:#a8e6d3;
+  }
+  .callout-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    opacity:0.75;
+    margin-bottom:5px;
+    display:block;
+  }
+
+  /* notes/pacing footer section */
+  .footnote-block{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--panel);
+    padding:20px 22px;
+    margin:24px 0 40px;
+  }
+  .footnote-block h3{font-size:14px;margin:0 0 10px;font-weight:600;}
+  .footnote-block p{font-size:13.5px;color:var(--text-dim);margin:0 0 8px;}
+  .footnote-block ul{margin:8px 0 0;padding-left:18px;color:var(--text-dim);font-size:13.5px;}
+  .footnote-block li{margin-bottom:4px;}
+
+  .phase-due{font-size:12px;margin:5px 0 0;font-family:var(--mono);}
+  .due-badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:4px;
+    font-size:11px;
+    letter-spacing:0.2px;
+  }
+  .due-badge.ontrack{background:var(--amber-dim);color:#f0c98a;border:1px solid #4a3a22;}
+  .due-badge.overdue{background:#3a1f1f;color:#f08a8a;border:1px solid #5a2a2a;}
+  .due-badge.done-sched{background:var(--teal-dim);color:#a8e6d3;border:1px solid #234741;}
+
+  .start-date-wrap{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .start-date-label{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-faint);
+  }
+  .start-date-input{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:11px;
+    padding:4px 6px;
+    border-radius:4px;
+    color-scheme:dark;
+  }
+
+  @media (max-width:600px){
+    .hero h1{font-size:23px;}
+    .phase-head{padding:14px 16px;}
+    .phase-body{padding:4px 16px 14px;}
+    .ts-link{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">SAA-C03 <b>exam tracker</b></div>
+    <div class="progress-track"><div class="progress-fill" id="globalFill"></div></div>
+    <div class="progress-pct" id="globalPct">0%</div>
+    <div class="start-date-wrap">
+      <label for="startDateInput" class="start-date-label">Start</label>
+      <input type="date" id="startDateInput" class="start-date-input">
+    </div>
+    <button class="reset-btn" id="resetBtn" title="Clear all progress">reset</button>
+  </div>
+</div>
+
+<div class="hero">
+  <p class="hero-eyebrow">// CloudExpert Solutions&rsquo; 110-video SAA-C03 playlist, regrouped by exam domain</p>
+  <h1>Same 110 videos. A real order, and a deadline.</h1>
+  <p>This tracker takes the full SAA-C03 bootcamp playlist and regroups all 110 videos into 12 phases that follow how AWS architectures actually fit together &mdash; identity first, then compute, data, security, and networking &mdash; instead of upload order.</p>
+  <p>Click any topic to open that exact video in a new tab. Check it off once you can explain it without notes.</p>
+  <p>Set your start date in the top bar &mdash; every phase below gets a real deadline calculated from it, so "finish by" replaces "someday."</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><b>12</b> phases</div>
+    <div class="hero-meta-item"><b>110</b> videos</div>
+    <div class="hero-meta-item"><b>~45 hrs</b> of video</div>
+    <div class="hero-meta-item">Target finish: <b id="targetFinishVal">&mdash;</b></div>
+    <div class="hero-meta-item"><b id="dayCounterVal">&mdash;</b></div>
+  </div>
+</div>
+
+<div class="phase-nav" id="phaseNav"></div>
+
+<div class="container" id="phaseContainer"></div>
+
+<div class="container">
+  <div class="footnote-block">
+    <h3>How to actually use this</h3>
+    <p>For each video: watch it, then write a 2&ndash;3 sentence summary in your own words before checking it off. If you can't summarize it, you didn't learn it yet &mdash; rewatch.</p>
+    <p>Do the mini-project at the end of each phase before moving on. The exam tests architecture decisions, not video-watching &mdash; touching the console is what makes it stick.</p>
+    <p>If you finish a phase and can't answer its checkpoint without looking anything up, that phase isn't done. Go back before moving forward.</p>
+    <ul>
+      <li>Phase 00&ndash;01 (identity &amp; setup): go slow &mdash; almost everything later assumes you have this cold</li>
+      <li>Phase 06 &amp; 08 (security, VPC): the densest phases &mdash; budget extra time, don't rush them</li>
+      <li>Phase 11 (practice exams): space the 4 tests out by at least a few hours each, and actually review every wrong answer's explanation</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const PLAYLIST_ID = "PL7Jj8Ba9Yr6AEe1lS3zTf2jrd1bJ7nycj";
+
+const data = [
+  {
+    id:"p0", num:"00", title:"Kickoff &amp; account setup", sub:"Why you're doing this, then get AWS itself running", days:2,
+    topics:[
+      {t:"How to pass AWS Solution Architect Associate Certification without any PAID Courses?", v:"e4CY7NZDhDw", i:1, len:"11:45"},
+      {t:"AWS Bootcamp Kickoff - Setting Up Your AWS Account", v:"4fSeOOjhtQo", i:2, len:"17:41"},
+      {t:"AWS Free Tier Updates Explained | New Account Creation & Free Plan Changes", v:"dJDognMdk0Y", i:3, len:"14:30"},
+    ],
+    project:"Create your free-tier AWS account, enable MFA on the root user, and set a $1 billing alarm.",
+    check:"Why should the root account never be used for day-to-day work?"
+  },
+  {
+    id:"p1", num:"01", title:"Identity &amp; global infrastructure", sub:"Regions, IAM, and how AWS decides what you're allowed to touch", days:5,
+    topics:[
+      {t:"AWS Global Infrastructure Deep Dive", v:"mgs2058RwbI", i:4, len:"21:13"},
+      {t:"AWS Identity & Access Management (IAM) Overview", v:"TXC5YtJ_VHM", i:5, len:"34:50"},
+      {t:"AWS Shared Responsibility Model", v:"yA3KYzXwWHs", i:6, len:"10:03"},
+      {t:"AWS CLI, AWS SDK, AWS CloudShell | Demo", v:"w93iojoDTFY", i:7, len:"26:03"},
+      {t:"IAM Access Analyzer", v:"IAcPZoLIDGA", i:8, len:"15:42"},
+      {t:"AWS Security Token Service (STS)", v:"eODMPT1Lgzc", i:9, len:"11:06"},
+      {t:"IAM Identity Federation", v:"O7CCzr8Tq18", i:10, len:"18:20"},
+      {t:"AWS Directory Services", v:"iJrea0jEhHw", i:11, len:"20:30"},
+      {t:"IAM Identity Center(AWS SSO)", v:"Cj1QekxkLdw", i:12, len:"17:43"},
+    ],
+    project:"Create an IAM user for yourself with a least-privilege policy, turn on MFA for it, and run one command through the AWS CLI.",
+    check:"What's the actual difference between an IAM role and an IAM user?"
+  },
+  {
+    id:"p2", num:"02", title:"Compute &amp; scaling &mdash; EC2", sub:"Instances, load balancers, and auto scaling under the hood", days:7,
+    topics:[
+      {t:"Amazon EC2 Deep Dive", v:"7r7FCghQNPw", i:13, len:"49:57"},
+      {t:"Amazon EC2 Instance Types & Purchase Options", v:"ERNqEKe-iL0", i:14, len:"37:55"},
+      {t:"Amazon EC2 Networking", v:"QFlfTZdJSaM", i:15, len:"35:08"},
+      {t:"Amazon EC2 Storage Options Deep Dive", v:"p6g6EGFY8d4", i:16, len:"41:35"},
+      {t:"Amazon Elastic File System (EFS) - Deep Dive", v:"CEOimz50Fss", i:17, len:"18:37"},
+      {t:"Amazon EC2 Scalability & Availability", v:"KgYIKSYmA2k", i:18, len:"11:02"},
+      {t:"Application Load Balancer Deep Dive", v:"oHZbg49UYzI", i:19, len:"29:38"},
+      {t:"Application Load Balancer : Hands-On Demo", v:"kGQocFmLz6c", i:20, len:"24:50"},
+      {t:"AWS Elastic Load Balancers - Deep Dive", v:"HIbzthrOnPQ", i:21, len:"27:16"},
+      {t:"EC2 Auto Scaling Group - Deep Dive", v:"5E9In3OAjoQ", i:22, len:"18:30"},
+      {t:"Hands-On Demo: EC2 Auto Scaling with ALB & Target Groups", v:"094WjsNa5vk", i:23, len:"26:26"},
+      {t:"EC2 Cost Savings - Deep Dive", v:"O-B4weYyf20", i:24, len:"13:57"},
+    ],
+    project:"Launch an EC2 instance behind an Application Load Balancer, attach it to an Auto Scaling Group, then terminate the instance manually and watch ASG replace it.",
+    check:"Why pick an ASG + ALB pair over one large EC2 instance?"
+  },
+  {
+    id:"p3", num:"03", title:"Databases", sub:"Relational, NoSQL, and caching layers compared side by side", days:4,
+    topics:[
+      {t:"AWS Database Services Overview", v:"IM3mLBEY4UU", i:25, len:"12:34"},
+      {t:"Amazon RDS Deep Dive", v:"xWwKJQBZ7QY", i:26, len:"19:36"},
+      {t:"Amazon RDS Hands-On Demo", v:"rj8VbzIgBSE", i:27, len:"37:57"},
+      {t:"Amazon Aurora Deep Dive", v:"wRaMERTfxUA", i:28, len:"13:44"},
+      {t:"Aurora Serverless & Global Database", v:"PlR3pUyxTWA", i:29, len:"16:58"},
+      {t:"RDS & Aurora Backup, DR & Cloning", v:"Rkjcy79fzfk", i:30, len:"16:09"},
+      {t:"Amazon ElastiCache Deep Dive (Redis and Memcached)", v:"PBAXOqTiFxQ", i:31, len:"18:39"},
+      {t:"Amazon DynamoDB Explained for Beginner", v:"bA2pvMT4Ooo", i:32, len:"26:26"},
+      {t:"Amazon DynamoDB Accelerator (DAX) Deep Dive", v:"CC9pi3JWKDs", i:33, len:"10:16"},
+      {t:"AWS DynamoDB Advanced Concepts Explained", v:"3pkx9PeHHUg", i:34, len:"15:19"},
+    ],
+    project:"Spin up a small RDS instance with a read replica, then model the same data in a DynamoDB table.",
+    check:"When would you reach for DynamoDB instead of RDS?"
+  },
+  {
+    id:"p4", num:"04", title:"Storage &mdash; Amazon S3", sub:"Storage classes, encryption, lifecycle rules, and access control", days:4,
+    topics:[
+      {t:"Amazon S3 Deep Dive for Beginners", v:"8KWT6589j6o", i:35, len:"11:52"},
+      {t:"Amazon S3 Storage Classes Decoded", v:"XGm6h0Vz7Bw", i:36, len:"15:05"},
+      {t:"Amazon S3 Encryption Deep Dive", v:"OPbm5EJGH_o", i:37, len:"23:43"},
+      {t:"Amazon S3 Performance Optimization Strategies", v:"PMsW2s2sJjQ", i:38, len:"9:12"},
+      {t:"Master Amazon S3 Data Protection: Object Lock, Glacier Vault Lock & MFA Delete", v:"b4r3hCHX0nQ", i:39, len:"10:06"},
+      {t:"Amazon S3 Lifecycle Rules Deep Dive", v:"5cMl3DEQRfw", i:40, len:"13:31"},
+      {t:"Amazon S3 Object Replication Explained | Cross-Region, Same-Region & Demo", v:"pNCNl7ngT34", i:41, len:"14:22"},
+      {t:"Amazon S3 Analytics, Storage Lens & Batch Operations", v:"xmIC2zG_nL8", i:42, len:"14:14"},
+      {t:"Amazon S3 Static Website Hosting, Block Public Access & CORS", v:"PGAxscVzCS4", i:43, len:"14:47"},
+      {t:"Amazon S3 Access Logs, Event Notifications & Pre-Signed URLs", v:"BpETXQGGvt4", i:44, len:"17:31"},
+      {t:"Amazon S3 Access Points, Object Lambda & Requester Pays Explained", v:"y-hgSUg9iqw", i:45, len:"14:21"},
+    ],
+    project:"Create an S3 bucket, add a lifecycle rule that transitions objects to Glacier, and turn on static website hosting.",
+    check:"What's the real difference between S3 Standard-IA and One Zone-IA?"
+  },
+  {
+    id:"p5", num:"05", title:"Migration, hybrid storage &amp; DR", sub:"Getting data and on-prem workloads into AWS, and recovering from disaster", days:2,
+    topics:[
+      {t:"AWS Snow Family Deep Dive | Snowcone, Snowball Edge & Snowmobile Explained", v:"pbLy9n_nQUg", i:46, len:"12:26"},
+      {t:"AWS Storage Gateway Deep Dive | File, Volume & Tape Gateway", v:"BSn8bTUxdZo", i:47, len:"15:50"},
+      {t:"AWS Transfer Family Deep Dive | SFTP, FTPS, FTP in AWS", v:"tH6JJrsX3aI", i:48, len:"8:47"},
+      {t:"Amazon FSx Deep Dive (Windows, Lustre, ONTAP, OpenZFS)", v:"hQomePOQECY", i:49, len:"18:44"},
+      {t:"AWS DataSync Deep Dive (Architecture, Use Cases & Task Modes)", v:"Pc-qazUm6Qc", i:50, len:"14:21"},
+      {t:"AWS Disaster Recovery Strategies Explained | RTO, RPO, DR Patterns for SAA Exam", v:"aI6ACMrL5hU", i:51, len:"15:49"},
+      {t:"AWS Backup Deep Dive & Demo | Disaster Recovery & Backup Strategy", v:"mtoBKLJwRqs", i:52, len:"16:37"},
+      {t:"AWS DMS Deep Dive | Database Migration Tutorial | AWS DMS & SCT Explained", v:"2havOWqq6fM", i:53, len:"18:23"},
+      {t:"AWS Application Migration Explained | AWS Migration Services Deep Dive", v:"uAc6PKYm3jE", i:54, len:"15:58"},
+      {t:"AWS Elastic Disaster Recovery (DRS) Deep Dive", v:"qZBes2cWo-0", i:55, len:"11:23"},
+    ],
+    project:"Open AWS Backup and build a backup plan for one resource, then sketch an RTO/RPO target for a sample app.",
+    check:"What's the difference between pilot light and warm standby as DR strategies?"
+  },
+  {
+    id:"p6", num:"06", title:"Security, identity &amp; compliance", sub:"The toolkit AWS gives you to protect, detect, and prove", days:7,
+    topics:[
+      {t:"AWS Security Services Overview", v:"f49p16mozf0", i:56, len:"10:49"},
+      {t:"Amazon Inspector Deep Dive & Demo for AWS Exams", v:"BQkUsIAedSk", i:57, len:"19:26"},
+      {t:"Master AWS CloudTrail - Deep Dive & Demo for AWS Exams", v:"4iKyIga88oY", i:58, len:"18:38"},
+      {t:"Master Amazon Macie - Deep Dive & Demo for AWS Exams", v:"me2NNdMxcIc", i:59, len:"19:17"},
+      {t:"Amazon GuardDuty- Deep Dive & Demo for AWS Exams", v:"-HpiFAAAm7M", i:60, len:"20:44"},
+      {t:"AWS Artifact - Deep Dive & Demo for AWS Exams", v:"MopzlZBsz5E", i:61, len:"11:43"},
+      {t:"AWS Trusted Advisor Explained for AWS Exams", v:"xfqDa7hRnII", i:62, len:"15:00"},
+      {t:"AWS Audit Manager Deep Dive & Demo for AWS Exams", v:"OCABX05S_WY", i:63, len:"12:46"},
+      {t:"AWS Secrets Manager Explained | Secure Credentials, Password Rotation & Demo", v:"si43CANrZdQ", i:64, len:"18:13"},
+      {t:"AWS KMS Explained | Encrypt Data, Manage Keys & Real-World Demo", v:"3vTsANboFq8", i:65, len:"27:26"},
+      {t:"AWS CloudHSM Explained with Real-Life Demo | KMS vs CloudHSM", v:"2XN4fSQkeGg", i:66, len:"18:08"},
+      {t:"AWS Certificate Manager (ACM) Full Guide + Demo | HTTPS & SSL Made Easy", v:"npAh6Ghi0gE", i:67, len:"15:38"},
+      {t:"AWS Shield Explained with Demo | DDoS Protection | Deep Dive & Demo", v:"VHTHyQ1Qzok", i:68, len:"15:38"},
+      {t:"AWS WAF Explained with Demo | Web ACL, Rules & Exam Scenarios", v:"t_RsO5RnVZA", i:69, len:"18:23"},
+      {t:"AWS Network Firewall Deep Dive & Architecture Demo", v:"QYjHrEQWR6g", i:70, len:"17:46"},
+      {t:"AWS Firewall Manager Explained", v:"5YecQ7qDdsU", i:71, len:"15:23"},
+      {t:"Amazon Cognito Explained | User Pool vs Identity Pool + Exam Tips", v:"g21WhXIqxmc", i:72, len:"17:06"},
+      {t:"AWS Security Hub Deep Dive | Real-World Security Use Cases + Exam Questions", v:"M64UX858ZmU", i:73, len:"17:28"},
+    ],
+    project:"Turn on GuardDuty and Security Hub, generate one finding, and trace it end-to-end.",
+    check:"When do you actually need CloudHSM over KMS?"
+  },
+  {
+    id:"p7", num:"07", title:"Networking &mdash; DNS &amp; content delivery", sub:"Route 53, Global Accelerator, and CloudFront working together", days:4,
+    topics:[
+      {t:"AWS Route 53 Made Easy | DNS, Record Types & Hosted Zones Explained", v:"omkZmFJUztI", i:74, len:"20:38"},
+      {t:"AWS Route 53 Routing Policies – Every Policy Explained with Diagrams", v:"Yfw-r830V-A", i:75, len:"24:00"},
+      {t:"AWS Route 53 Health Checks Explained | Fail over & CloudWatch", v:"LNlwqXb87H8", i:76, len:"13:09"},
+      {t:"AWS Route 53 Alias Record vs CNAME Explained", v:"cFfRO3rKV_A", i:77, len:"14:58"},
+      {t:"AWS Global Accelerator Explained — Anycast IP, Failover", v:"9LPKDeRlobg", i:78, len:"22:26"},
+      {t:"AWS Global Accelerator - Advanced Concepts", v:"AIv-GGwQLMk", i:79, len:"20:10"},
+      {t:"Amazon CloudFront Explained - CDN, Edge Locations, CloudFront Origins", v:"BkqO0ScUaf8", i:80, len:"30:59"},
+      {t:"Amazon CloudFront Caching Explained | TTL, Cache Control, Invalidation", v:"bokPShSe8sw", i:81, len:"36:45"},
+      {t:"Amazon CloudFront Security Explained | OAC, Signed URLs, WAF, Shield", v:"2kvm5IKWkkM", i:82, len:"33:59"},
+      {t:"Amazon CloudFront Advanced Concepts | Lambda@Edge vs CloudFront Functions", v:"jJQphRoySe8", i:83, len:"26:54"},
+      {t:"How to host a Website on AWS? | Amazon S3 + Amazon CloudFront - Hands-On Demo", v:"1IRnIodklXc", i:84, len:"21:05"},
+    ],
+    project:"Point a Route 53 hosted zone at an S3-hosted static site through CloudFront.",
+    check:"What's the difference between an Alias record and a CNAME?"
+  },
+  {
+    id:"p8", num:"08", title:"Networking &mdash; VPC deep dive", sub:"Subnets, gateways, peering, and connecting back to on-prem", days:7,
+    topics:[
+      {t:"Amazon VPC Explained for AWS | Subnets, Route Tables, Security Groups & NACL", v:"lC_XOPbuzdM", i:85, len:"37:15"},
+      {t:"AWS NAT Gateway & VPC Peering Explained | Advanced VPC Networking", v:"b7nXVSKZwQE", i:86, len:"20:34"},
+      {t:"AWS VPC Endpoints & Flow Logs Explained | Gateway vs Interface + Bastion Host", v:"rLuoUPVgSq0", i:87, len:"25:14"},
+      {t:"AWS VPC Advanced Architecture Explained | Multi-AZ, Direct Connect & Shared VPC", v:"w1kjYIiBEec", i:88, len:"49:42"},
+      {t:"Amazon VPC Hands-On Lab | Build VPC, NAT Gateway, Routing & Load Balancer", v:"Sk-ZX6NF6wg", i:89, len:"37:17"},
+      {t:"AWS Transit Gateway Deep Dive | TGW Peering, ECMP & TGW Route Tables", v:"Sy90UAV24YI", i:90, len:"44:04"},
+      {t:"AWS Transit Gateway Hands-On Demo | Connect Multiple VPCs Step-by-Step", v:"s_k7CAYgRjw", i:91, len:"20:44"},
+      {t:"AWS PrivateLink Explained | Interface Endpoints, NLB & VPC Peering vs TGW", v:"DiuMg_TxmKI", i:92, len:"27:26"},
+      {t:"All you need to know about AWS Direct Connect (DX)", v:"VnDu8WmYID0", i:93, len:"41:45"},
+      {t:"AWS Site-to-Site VPN - AWS Networking", v:"h8b59GWP0sk", i:94, len:"23:41"},
+      {t:"AWS Client VPN Deep Dive – Split Tunnel, Auth & Exam Questions Explained", v:"BL6y4H3ofMA", i:95, len:"30:22"},
+    ],
+    project:"Build a custom VPC with public and private subnets, a NAT Gateway, and a bastion host.",
+    check:"Why can't a NAT Gateway replace an Internet Gateway?"
+  },
+  {
+    id:"p9", num:"09", title:"Integration, messaging &amp; serverless", sub:"How decoupled components talk &mdash; queues, topics, events, and Lambda", days:7,
+    topics:[
+      {t:"Amazon SQS Deep Dive – Standard, FIFO, DLQ & Lambda Integration Explained", v:"xU_pcfpJG7Q", i:96, len:"32:58"},
+      {t:"Amazon SNS Deep Dive | Topics, Fanout, Filtering & Exam Tips", v:"9dVkdn5sJyA", i:97, len:"21:18"},
+      {t:"AWS SNS & SQS Hands-On Lab | Fanout Pattern, DLQ & Lambda Trigger", v:"pkVpmIvrp9M", i:98, len:"25:59"},
+      {t:"Mastering AWS EventBridge: Building Event Driven Architectures", v:"vm4DNBAZg60", i:99, len:"27:40"},
+      {t:"Amazon MQ Deep Dive & Demo | Managed Message Broker | RabbitMQ, ActiveMQ", v:"D181HotC_AY", i:100, len:"18:58"},
+      {t:"When should I use AppFlow instead of Glue or EventBridge?", v:"MFCO02oiQv8", i:101, len:"21:30"},
+      {t:"AppSync vs API Gateway | Which AWS API Service Should You Use?", v:"veiwA7rPkxc", i:102, len:"27:49"},
+      {t:"AWS Step Functions Deep Dive & Hands-On Demo | State Machine, Workflows", v:"w0oPEsU9mvg", i:103, len:"35:07"},
+      {t:"AWS Lambda Beginner to Expert - 100% Hands-On Demos: Most Popular Masterclass", v:"fDmvIMAkvbA", i:104, len:"2:23:16"},
+    ],
+    project:"Fan an SNS topic out to two SQS queues, and trigger a Lambda from one of them.",
+    check:"When would you reach for Step Functions instead of chaining Lambdas directly?"
+  },
+  {
+    id:"p10", num:"10", title:"Architecture wrap-up", sub:"Well-Architected Framework and a look at containers", days:2,
+    topics:[
+      {t:"AWS Well-Architected Framework Explained | 6 Pillars Deep Dive", v:"NHPhWLvqWOs", i:105, len:"15:56"},
+      {t:"A Complete Overview of AWS ECS (Elastic Container Service)", v:"FDdn6OVSVdY", i:106, len:"35:44"},
+    ],
+    project:"Run your Phase 02 project through all 6 Well-Architected pillars and write down one gap you'd fix.",
+    check:"Which pillar do most scenario questions quietly hide in?"
+  },
+  {
+    id:"p11", num:"11", title:"Final practice exams", sub:"Four full-length tests &mdash; this is where gaps surface", days:4,
+    topics:[
+      {t:"AWS Practice Test Set 01 | 20 Real Exam Questions with Detailed Explanations", v:"ZUSSMWpPzio", i:107, len:"1:06:57"},
+      {t:"AWS Practice Test Set 02 | 20 Real Exam Questions with Detailed Explanations", v:"dEH8erHcv9c", i:108, len:"1:00:40"},
+      {t:"AWS Solution Architect Associate - Practice Test Set 03 | 25 Exam Questions + Detailed Explanations", v:"9mWPIlkGugo", i:109, len:"1:20:56"},
+      {t:"AWS Solution Architect Associate - Practice Test Set 04 | 30 Questions with Detailed Explanations", v:"wBnGac8WfrU", i:110, len:"1:40:39"},
+    ],
+    project:"Take all 4 practice tests under real exam time pressure, and log which domain you got wrong the most.",
+    check:"Which exam domain is consistently your weakest across all 4 sets?"
+  },
+];
+
+function todayStr(){
+  const d = new Date();
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+
+function fmtDate(d){
+  return d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+}
+
+function computeSchedule(){
+  const sched = {};
+  let cursor = new Date(state.startDate + 'T00:00:00');
+  let lastEnd = cursor;
+  data.forEach(phase => {
+    const days = phase.days || 2;
+    const start = new Date(cursor);
+    const end = new Date(cursor);
+    end.setDate(end.getDate() + days - 1);
+    sched[phase.id] = { start, end, days };
+    lastEnd = end;
+    cursor = new Date(end);
+    cursor.setDate(cursor.getDate() + 1);
+  });
+  sched._totalDays = data.reduce((sum, p) => sum + (p.days || 2), 0);
+  sched._finish = lastEnd;
+  return sched;
+}
+
+let state = {};
+
+function topicKey(phaseId, idx){ return phaseId+"_"+idx; }
+
+function render(){
+  if(!state.startDate) state.startDate = todayStr();
+  const schedule = computeSchedule();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const nav = document.getElementById('phaseNav');
+  const container = document.getElementById('phaseContainer');
+  nav.innerHTML = '';
+  container.innerHTML = '';
+
+  let totalTopics = 0, totalDone = 0;
+
+  data.forEach(phase => {
+    const doneCount = phase.topics.filter((_, i) => state[topicKey(phase.id, i)]).length;
+    const isComplete = doneCount === phase.topics.length;
+    totalTopics += phase.topics.length;
+    totalDone += doneCount;
+
+    const pill = document.createElement('div');
+    pill.className = 'phase-pill' + (isComplete ? ' complete' : '');
+    pill.textContent = phase.num + ' ' + phase.title.replace(/&amp;/g,'&').replace(/&mdash;/g,'\u2014');
+    pill.onclick = () => {
+      document.getElementById('phase-'+phase.id).scrollIntoView({behavior:'smooth', block:'start'});
+      openPhase(phase.id, true);
+    };
+    nav.appendChild(pill);
+
+    const el = document.createElement('div');
+    el.className = 'phase' + (isComplete ? ' complete' : '');
+    el.id = 'phase-'+phase.id;
+
+    const pct = phase.topics.length ? Math.round((doneCount/phase.topics.length)*100) : 0;
+
+    const sc = schedule[phase.id];
+    let dueHtml = '';
+    if(sc){
+      if(isComplete){
+        dueHtml = `<span class="due-badge done-sched">Done</span>`;
+      } else if(today > sc.end){
+        dueHtml = `<span class="due-badge overdue">Overdue &mdash; was due ${fmtDate(sc.end)}</span>`;
+      } else {
+        dueHtml = `<span class="due-badge ontrack">Finish by ${fmtDate(sc.end)}</span>`;
+      }
+    }
+
+    let topicsHtml = '';
+    phase.topics.forEach((topic, i) => {
+      const key = topicKey(phase.id, i);
+      const checked = !!state[key];
+      const url = `https://www.youtube.com/watch?v=${topic.v}&list=${PLAYLIST_ID}&index=${topic.i}`;
+      topicsHtml += `
+        <div class="topic-row${checked?' done':''}">
+          <div class="checkbox${checked?' checked':''}" data-key="${key}" role="checkbox" aria-checked="${checked}" tabindex="0"></div>
+          <div class="topic-main">
+            <a class="topic-link" href="${url}" target="_blank" rel="noopener">${topic.t}</a>
+          </div>
+          <a class="ts-link" href="${url}" target="_blank" rel="noopener">${topic.len}</a>
+        </div>`;
+    });
+
+    let projectHtml = '';
+    if(phase.project){
+      projectHtml = `<div class="callout callout-project"><span class="callout-label">Mini-project</span>${phase.project}</div>`;
+    }
+    let checkHtml = '';
+    if(phase.check){
+      checkHtml = `<div class="callout callout-check"><span class="callout-label">Checkpoint</span>${phase.check}</div>`;
+    }
+
+    el.innerHTML = `
+      <div class="phase-head" data-phase="${phase.id}">
+        <div class="phase-num">${phase.num}</div>
+        <div class="phase-titles">
+          <p class="phase-title">${phase.title}</p>
+          <p class="phase-sub">${phase.sub}</p>
+          <p class="phase-due">${dueHtml}</p>
+        </div>
+        <div class="phase-count">${doneCount}/${phase.topics.length}</div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"></polyline></svg>
+      </div>
+      <div class="phase-bar"><div class="phase-bar-fill" style="width:${pct}%"></div></div>
+      <div class="phase-body">
+        ${topicsHtml}
+        ${projectHtml}
+        ${checkHtml}
+      </div>
+    `;
+    container.appendChild(el);
+  });
+
+  const globalPct = totalTopics ? Math.round((totalDone/totalTopics)*100) : 0;
+  document.getElementById('globalFill').style.width = globalPct + '%';
+  document.getElementById('globalPct').textContent = globalPct + '%';
+
+  const targetFinishVal = document.getElementById('targetFinishVal');
+  if(targetFinishVal) targetFinishVal.textContent = fmtDate(schedule._finish);
+
+  const dayCounterVal = document.getElementById('dayCounterVal');
+  if(dayCounterVal){
+    const startD = new Date(state.startDate + 'T00:00:00');
+    const elapsed = Math.floor((today - startD) / 86400000) + 1;
+    dayCounterVal.textContent = elapsed < 1
+      ? 'Starts ' + fmtDate(startD)
+      : 'Day ' + elapsed + ' of ' + schedule._totalDays;
+  }
+
+  const startInput = document.getElementById('startDateInput');
+  if(startInput) startInput.value = state.startDate;
+
+  attachHandlers();
+}
+
+let openPhaseId = null;
+function openPhase(id, forceOpen){
+  const el = document.getElementById('phase-'+id);
+  if(!el) return;
+  if(forceOpen){
+    document.querySelectorAll('.phase.open').forEach(p => { if(p.id !== 'phase-'+id) p.classList.remove('open'); });
+    el.classList.add('open');
+  } else {
+    el.classList.toggle('open');
+  }
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.phase-head').forEach(head => {
+    head.onclick = () => openPhase(head.dataset.phase, false);
+  });
+  document.querySelectorAll('.checkbox').forEach(cb => {
+    const toggle = () => {
+      const key = cb.dataset.key;
+      state[key] = !state[key];
+      saveState();
+      render();
+    };
+    cb.onclick = (e) => { e.stopPropagation(); toggle(); };
+    cb.onkeydown = (e) => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); toggle(); } };
+  });
+}
+
+const STORAGE_KEY = 'saa-c03-study-progress';
+const hasInMemoryFallback = (typeof window.storage === 'undefined');
+let memoryFallback = null;
+
+async function saveState(){
+  const json = JSON.stringify(state);
+  try{
+    if(window.storage && window.storage.set){
+      await window.storage.set(STORAGE_KEY, json);
+      return;
+    }
+  }catch(e){}
+  try{
+    document.cookie = STORAGE_KEY + '=' + encodeURIComponent(json) + ';max-age=31536000;path=/';
+  }catch(e){}
+  memoryFallback = json;
+}
+
+function readCookie(name){
+  const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return match ? decodeURIComponent(match.pop()) : null;
+}
+
+async function loadState(){
+  try{
+    if(window.storage && window.storage.get){
+      const result = await window.storage.get(STORAGE_KEY);
+      if(result && result.value){
+        state = JSON.parse(result.value);
+      }
+      render();
+      if(data.length){ document.getElementById('phase-'+data[0].id).classList.add('open'); }
+      return;
+    }
+  }catch(e){}
+  try{
+    const cookieVal = readCookie(STORAGE_KEY);
+    if(cookieVal){ state = JSON.parse(cookieVal); }
+    else if(memoryFallback){ state = JSON.parse(memoryFallback); }
+  }catch(e){
+    state = {};
+  }
+  render();
+  if(data.length){
+    document.getElementById('phase-'+data[0].id).classList.add('open');
+  }
+}
+
+document.getElementById('resetBtn').onclick = async () => {
+  if(!confirm('Clear all progress? This cannot be undone.')) return;
+  state = {};
+  await saveState();
+  render();
+};
+
+document.getElementById('startDateInput').addEventListener('change', async (e) => {
+  state.startDate = e.target.value || todayStr();
+  await saveState();
+  render();
+});
+
+loadState();
+</script>
+
+</body>
+</html>
